@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heart Disease Prediction</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+* {margin:0; padding:0; box-sizing:border-box;}
+body {
+    font-family: 'Roboto Slab', serif;
+    background: radial-gradient(circle at 20% 20%, #0d0d0d, #1a1a1a, #000);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+h1 {
+    font-size: 3.5em;
+    margin-bottom: 25px;
+    color: #ff3366;
+    text-shadow: 0 4px 20px rgba(255, 51, 102, 0.8);
+    letter-spacing: 3px;
+    font-family: 'Orbitron', sans-serif;
+    animation: pulse 2s infinite alternate;
+}
+@keyframes pulse {
+    from {text-shadow: 0 0 8px #ff3366;}
+    to {text-shadow: 0 0 25px #ff3366;}
+}
+
+form { margin-bottom: 40px; }
+
+input[type="file"] {
+    display: block;
+    margin: 0 auto 20px auto;
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #00e6e6;
+    font-size: 1em;
+    cursor: pointer;
+    background: rgba(20, 20, 20, 0.7);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    transition: 0.3s;
+}
+input[type="file"]:hover {
+    background: rgba(0, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+button {
+    background: linear-gradient(135deg, #00ff99, #00ccff);
+    border: none;
+    padding: 15px 40px;
+    border-radius: 14px;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.4s ease-in-out;
+    box-shadow: 0 8px 20px rgba(0,255,200,0.4);
+}
+button:hover {
+    transform: scale(1.08) rotate(-1deg);
+    box-shadow: 0 0 25px #00e6ff;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 900px;
+    border-radius: 25px;
+    background: rgba(24, 24, 24, 0.8);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 12px 40px rgba(0,255,255,0.3);
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(2deg);
+    transition: transform 0.6s;
+}
+.result:hover {
+    transform: perspective(1000px) rotateX(0deg) scale(1.02);
+}
+
+
+.result img {
+    max-width: 70%;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,255,255,0.3);
+    filter: brightness(1.05) contrast(1.15);
+    transition: all 0.6s ease-in-out;
+    animation: fadeIn 1.5s ease-in-out;
+}
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.9) blur(2px);}
+    to {opacity: 1; transform: scale(1) blur(0);}
+}
+.result img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(0,255,255,0.6);
+    filter: brightness(1.15) contrast(1.2);
+}
+
+.prediction {
+    font-size: 2.3em;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #00e6e6;
+    text-shadow: 0 0 18px rgba(0,255,255,0.8);
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    max-width: 100%;
+    line-height: 1.4;
+    word-break: break-all;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+@keyframes glow {
+    from {text-shadow: 0 0 10px #00ffff;}
+    to {text-shadow: 0 0 25px #00cccc;}
+}
+
+
+.severity {
+    font-size: 1.8em;
+    font-weight: 700;
+    padding: 12px 30px;
+    border-radius: 14px;
+    display: inline-block;
+    margin-bottom: 20px;
+    box-shadow:
+        inset 0 2px 8px rgba(255,255,255,0.15),
+        0 8px 20px rgba(0,0,0,0.5),
+        0 0 25px rgba(0,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.15);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transform: perspective(600px) translateZ(15px);
+    transition: all 0.4s ease-in-out;
+    position: relative;
+}
+.severity::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0.5;
+}
+.severity:hover {
+    transform: perspective(600px) translateZ(25px) scale(1.1);
+    box-shadow: 0 0 30px rgba(0,255,255,0.8), 0 8px 25px rgba(0,0,0,0.7);
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+}
+.severity.Healthy { background: linear-gradient(135deg, #00b347, #008a36); color: #b9f6ca; }
+.severity.Mild { background: linear-gradient(135deg, #0066ff, #33aaff); color: #cce7ff; }
+.severity.Moderate { background: linear-gradient(135deg, #ffb300, #ff9100); color: #fff3e0; }
+.severity.Severe { background: linear-gradient(135deg, #ff1744, #b71c1c); color: #ffdde0; }
+.severity.Unknown { background: linear-gradient(135deg, #795548, #5d4037); color: #ffe0b2; }
+
+
+.language-select {
+    margin-top: 25px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: rgba(15, 15, 15, 0.8);
+    color: #00e6e6;
+    border: 2px solid #00e6e6;
+    box-shadow:
+        inset 0 2px 10px rgba(0,255,255,0.2),
+        0 5px 20px rgba(0,255,255,0.3);
+    transition: all 0.4s ease-in-out;
+    appearance: none;
+    position: relative;
+    background-image: linear-gradient(145deg, rgba(0,255,255,0.15), transparent);
+}
+.language-select:hover {
+    transform: scale(1.05);
+    box-shadow:
+        0 0 30px rgba(0,255,255,0.5),
+        inset 0 0 12px rgba(0,255,255,0.3);
+}
+.language-select:focus {
+    outline: none;
+    box-shadow:
+        0 0 35px rgba(0,255,255,0.7),
+        inset 0 0 15px rgba(0,255,255,0.4);
+    background: rgba(0,0,0,0.9);
+}
+
+.precaution, .diet {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #ffcc00;
+    text-align: left;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    background: rgba(255, 255, 0, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+}
+.precaution strong, .diet strong { color:#00ffff; display:block; margin-bottom:8px; }
+.precaution ul, .diet ul { list-style: disc; margin-left: 22px; }
+
+.machine-img {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    width: 100px;
+    opacity: 0.9;
+}
+
+
+.pdf-btn {
+    margin-top: 15px;
+    background: linear-gradient(135deg, #00ff66, #00cc99, #00ffaa);
+    background-size: 200% 200%;
+    padding: 12px 30px;
+    border-radius: 14px;
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.4s ease-in-out;
+    box-shadow: 0 0 20px rgba(0, 255, 128, 0.5);
+    animation: gradientMove 4s ease infinite;
+}
+@keyframes gradientMove {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+.pdf-btn:hover {
+    background: linear-gradient(135deg, #00ffcc, #66ff66, #00ff99, #00ffff);
+    box-shadow: 0 0 35px #00ff99, 0 0 55px #00ffcc;
+    transform: scale(1.1);
+}
+.result-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.left-panel, .right-panel {
+    text-align: center;
+}
+
+.uploaded-img {
+    width: 400px;
+    height: auto;
+    border-radius: 15px;
+    opacity: 0.9;
+    border: 2px solid #00ffff;
+}
+
+.overlay-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 400px;
+    height: auto;
+    border-radius: 15px;
+    opacity: 0.4;
+}
+
+canvas {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🫀 Heart Disease Prediction</h1>
+
+    <!-- Upload Form -->
+    <form id="uploadForm" action="/" method="POST" enctype="multipart/form-data">
+        <div class="form-row">
+            <input type="text" id="patientName" name="patientName" placeholder="Enter Name" required>
+            <input type="number" id="patientAge" name="patientAge" placeholder="Enter Age" required>
+            <select id="patientGender" name="patientGender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <!-- NEW PLACE INPUT FIELD -->
+            <input type="text" id="patientPlace" name="patientPlace" placeholder="Enter Place (City)" required>
+        </div>
+        <input id="fileInput" type="file" name="file" accept="image/*" required>
+        <button type="submit" class="upload-btn">Upload Image</button>
+    </form>
+
+    <!-- Error Message -->
+    {% if error %}
+        <div class="result">
+            <p class="prediction" style="color:#ff4444;">{{ error }}</p>
+        </div>
+    {% endif %}
+
+    <!-- Result Section -->
+    {% if filename %}
+    <div class="result-container">
+        <!-- LEFT: Uploaded Image -->
+        <div class="left-panel">
+            <h3 style="color:#00ffff;">Disease Region</h3>
+            <div class="img-container">
+                <img src="{{ url_for('static', filename='uploads/' ~ filename) }}" alt="Uploaded Image" class="uploaded-img">
+                {% if heatmap_path %}
+                <img src="{{ url_for('static', filename=heatmap_path) }}" alt="Disease Region" class="overlay-img">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RIGHT: Professional Graph -->
+        {% if preds %}
+        <div class="right-panel">
+            <h3 style="color:#00ffff;">Prediction Probability Chart</h3>
+            <canvas id="probabilityChart" width="420" height="380"></canvas>
+            <script>
+                const ctx = document.getElementById('probabilityChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ disease_classes | safe }},
+                        datasets: [{
+                            label: 'Probability',
+                            data: {{ preds | safe }},
+                            backgroundColor: [
+                                'rgba(255,0,0,0.7)',
+                                'rgba(255,77,77,0.7)',
+                                'rgba(255,99,132,0.7)',
+                                'rgba(255,51,51,0.7)',
+                                'rgba(255,150,150,0.7)'
+                            ],
+                            borderRadius: 10,
+                            borderWidth: 2,
+                            hoverBackgroundColor: 'rgba(255,0,0,1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: '#fff' } },
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            </script>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- BELOW: Prediction Info -->
+    {% if prediction %}
+        {% if prediction != "Not_Heart" %}
+            <div class="prediction-section">
+                <h2 class="predicted-title">Predicted Disease: 
+                    <span class="disease-name">{{ prediction }}</span>
+                </h2>
+                <button id="severityButton" class="severity-btn {{ severity|lower }}">
+                    Severity: {{ severity }}
+                </button>
+
+                <select id="languageSelect" class="language-select">
+                    <option value="">Select Language</option>
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                </select>
+            </div>
+
+            <!-- Precaution and Diet -->
+            <div class="precaution-diet">
+                <div id="precautionBox" class="info-box precaution-hover">
+                    <strong>🩹 Precautionary Measures</strong>
+                    <ul id="precautionList">
+                        <li>Regular cardiovascular check-ups.</li>
+                        <li>Maintain balanced diet and exercise routine.</li>
+                        <li>Avoid smoking and limit alcohol intake.</li>
+                        <li>Monitor blood pressure and sugar regularly.</li>
+                        <li>Stay stress-free through meditation and rest.</li>
+                    </ul>
+                </div>
+
+                <div id="dietBox" class="info-box diet-hover">
+                    <strong>🥗 Diet Plan</strong>
+                    <ul id="dietList">
+                        <li>Eat more vegetables, fruits, and whole grains.</li>
+                        <li>Reduce sodium and processed foods.</li>
+                        <li>Include omega-3 fatty acids and lean protein.</li>
+                        <li>Stay hydrated and avoid sugary drinks.</li>
+                        <li>Prefer steamed or grilled foods over fried.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Download Button -->
+            <div class="download-section">
+                <button id="downloadPdf" class="download-btn">📄 Download PDF</button>
+            </div>
+            <!-- ✅ Wikipedia Section -->
+            <div id="wikiSection" style="margin-top:40px; text-align:left; max-width:900px;">
+              <h2 style="color:#00ffff;">🩺 Learn More from Wikipedia</h2>
+              <div id="wikiContent" style="margin-top:10px; font-size:1.1em; line-height:1.6; color:#ccc;">
+                Wikipedia information will appear here after prediction.
+              </div>
+            </div>
+
+            <!-- ✅ NEW: HOSPITAL MAP SECTION -->
+            <div id="mapSection" style="margin-top: 50px; margin-bottom: 50px; width: 100%; max-width: 900px; text-align: center;">
+                <h2 style="color:#00ffff; text-shadow: 0 0 20px #00ffff; margin-bottom: 20px;">
+                    🏥 Nearest Cardiac Specialists in {{ patientPlace }}
+                </h2>
+                <div style="width: 100%; border-radius: 15px; overflow: hidden; border: 2px solid #00ffff; box-shadow: 0 0 20px rgba(0,255,255,0.3);">
+                    <iframe 
+                        width="100%" 
+                        height="450" 
+                        frameborder="0" 
+                        scrolling="no" 
+                        marginheight="0" 
+                        marginwidth="0" 
+                        src="https://maps.google.com/maps?q=cardiac+specialist+hospital+in+{{ patientPlace }}&t=&z=13&ie=UTF8&iwloc=&output=embed">
+                    </iframe>
+                </div>
+            </div>
+
+        {% else %}
+            <p class="precaution" style="color:#ff4444; text-align:center; margin-top:15px;">
+                This image doesn’t seem to show a heart. Please upload a valid MRI heart scan.
+            </p>
+        {% endif %}
+    {% endif %}
+
+    <img src="{{ url_for('static', filename='machine.png') }}" alt="Heart Machine" class="machine-img">
+</div>
+
+<!-- 💅 CSS -->
+<style>
+body {
+    background: radial-gradient(circle at center, #101010 0%, #000 100%);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+.container { width: 90%; margin: auto; padding: 20px; }
+
+h1 {
+    color: #00ffff;
+    text-shadow: 0 0 20px #00ffff;
+    margin-bottom: 25px;
+}
+
+/* FORM STYLING */
+.form-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+input, select {
+    padding: 12px 15px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 2px solid #00ffff;
+    background: #111;
+    color: white;
+    transition: all 0.3s;
+}
+input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 15px #00ffff;
+    transform: scale(1.05);
+}
+
+.upload-btn {
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 12px;
+    margin-top: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+.upload-btn:hover {
+    transform: scale(1.08);
+    background: linear-gradient(90deg, #ff4d4d, #ff1a1a);
+    box-shadow: 0 0 25px #ff0000;
+}
+
+/* RESULT LAYOUT */
+.result-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-top: 25px;
+}
+
+.left-panel, .right-panel {
+    flex: 1;
+    min-width: 420px;
+    max-width: 480px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 0 20px rgba(255,0,0,0.2);
+}
+
+.img-container { position: relative; }
+.uploaded-img, .overlay-img {
+    width: 100%;
+    height: 380px;
+    border-radius: 15px;
+    object-fit: cover;
+}
+.overlay-img { position: absolute; top: 0; left: 0; opacity: 0.4; }
+
+/* GRAPH */
+canvas {
+    background: #1c1c1c;
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* PREDICTION */
+.predicted-title {
+    color: #ff3333;
+    font-size: 26px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #ff0000;
+    animation: glowRed 3s infinite alternate;
+}
+@keyframes glowRed {
+    0% { text-shadow: 0 0 10px #ff0000; }
+    100% { text-shadow: 0 0 25px #ff4d4d; }
+}
+
+.disease-name {
+    color: #fff;
+    background: linear-gradient(90deg, #ff0000, #ff4d4d);
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: 0.4s;
+}
+.disease-name:hover {
+    background: linear-gradient(90deg, #ff4d4d, #ff0000);
+    box-shadow: 0 0 15px #ff0000;
+}
+
+/* SEVERITY BUTTON */
+.severity-btn {
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: none;
+    font-size: 18px;
+    animation: pulse 2s infinite;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.severity-btn:hover { transform: scale(1.1); }
+
+.severity-btn.mild { background: linear-gradient(90deg, #00c6ff, #0072ff); }
+.severity-btn.moderate { background: linear-gradient(90deg, #fff200, #ffb400); color:black; }
+.severity-btn.severe { background: linear-gradient(90deg, #ff0000, #cc0000); }
+.severity-btn.normal { background: linear-gradient(90deg, #00ff99, #00cc66); }
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 10px rgba(255,0,0,0.6); }
+    50% { box-shadow: 0 0 25px rgba(255,0,0,1); }
+    100% { box-shadow: 0 0 10px rgba(255,0,0,0.6); }
+}
+
+/* LANGUAGE */
+.language-select {
+    margin-left: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #111;
+    color: white;
+    border: 1px solid #00ffff;
+}
+
+/* INFO BOXES */
+.precaution-diet {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+.info-box {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 15px 20px;
+    width: 350px;
+    text-align: left;
+    box-shadow: 0 0 15px rgba(255,0,0,0.2);
+    transition: all 0.4s ease;
+}
+.info-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255,0,0,0.4);
+}
+.info-box strong { color:#ff3333; font-size:18px; }
+.info-box ul li {
+    margin: 8px 0;
+    list-style: '✔ ';
+    color: #ddd;
+}
+
+/* DOWNLOAD BUTTON */
+.download-section { margin-top: 25px; text-align: center; }
+
+.download-btn {
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.4s ease;
+}
+.download-btn:hover {
+    background: linear-gradient(90deg, #ff4d4d, #ff1a1a);
+    box-shadow: 0 0 25px #ff0000;
+    transform: scale(1.1);
+}
+</style>
+</body>
+
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script>
+const disease = "{{ prediction }}";
+const severity = "{{ severity }}";
+const CHECKUPS = {
+    Healthy: {
+        daily: ["Take morning walk for 30 mins", "Monitor heart rate if needed", "Stay hydrated"],
+        weekly: ["General health checkup", "Light exercise 3-4 times per week"]
+    },
+    Mild: {
+        daily: ["Check blood pressure in the morning", "Light stretching or yoga", "Monitor diet"],
+        weekly: ["Cardiologist visit if advised", "Moderate exercise 3 times a week"]
+    },
+    Moderate: {
+        daily: ["Take medications on time", "Monitor blood pressure & heart rate", "Avoid strenuous activity"],
+        weekly: ["Weekly consultation with doctor", "Check cholesterol and vitals"]
+    },
+    Severe: {
+        daily: ["Hospital monitoring if needed", "Take prescribed medications on time", "Avoid stress and strenuous activity"],
+        weekly: ["Weekly cardiologist follow-up", "Routine blood tests as advised"]
+    },
+    Unknown: {
+        daily: ["Track symptoms", "Maintain healthy diet", "Stay hydrated"],
+        weekly: ["Consult doctor for evaluation", "Routine health checkup"]
+    }
+};
+const SEVERITY_COLORS = {
+    Healthy: [0, 179, 71],   
+    Mild: [0, 102, 255],     
+    Moderate: [255, 179, 0],  
+    Severe: [255, 23, 68],   
+    Unknown: [117, 84, 61]    
+};
+
+
+const langSelect = document.getElementById('languageSelect');
+const precautionBox = document.getElementById('precautionBox');
+const precautionList = document.getElementById('precautionList');
+const dietBox = document.getElementById('dietBox');
+const dietList = document.getElementById('dietList');
+const downloadBtn = document.getElementById('downloadPdf');
+
+
+const DATA = {
+ en: {
+  "Heart_Disease": {
+    Healthy: { 
+      precaution:["Regular exercise","Maintain healthy diet","Drink plenty of water","Get enough sleep","Reduce stress","Avoid smoking","Regular checkups"], 
+      diet:["Eat plenty of colorful fruits and vegetables","Include lean protein like chicken or tofu","Choose whole grains such as oats or brown rice","Have low-fat milk or yogurt","Snack on nuts and seeds in small amounts","Drink enough water daily","Avoid junk or fried food","Keep meals balanced and light"]
+    },
+    Mild: { 
+      precaution:["Reduce salt intake","Monitor blood pressure","Light exercise daily","Avoid excess sugar","Regular cardiologist visits","Limit alcohol","Maintain ideal weight"], 
+      diet:["Start your day with oats or porridge","Add more green vegetables to meals","Eat berries or citrus fruits for snacks","Prefer grilled or baked fish and chicken","Use olive oil for cooking","Have low-fat dairy items","Avoid heavy or spicy meals","Drink herbal tea instead of sugary drinks"]
+    },
+    Moderate: { 
+      precaution:["Take prescribed medications","Regular cardiologist checkups","Avoid smoking and alcohol","Manage stress","Monitor cholesterol","Follow exercise routine","Keep medical logs"], 
+      diet:["Choose whole grains like brown rice and wheat","Eat fish twice a week","Include nuts and seeds for healthy fats","Have fresh fruits daily","Add leafy greens to every meal","Use olive oil instead of butter","Eat home-cooked food","Avoid processed and salty snacks"]
+    },
+    Severe: { 
+      precaution:["Hospital monitoring required","Strict medication adherence","Emergency plan ready","Avoid strenuous activity","Monitor vitals regularly","Reduce stress","Follow diet plan strictly"], 
+      diet:["Eat small, frequent meals","Prefer steamed or boiled vegetables","Have fish or lean meat once in a while","Choose brown rice or oats instead of white rice","Drink warm herbal teas","Completely avoid processed and salty foods","Use less oil in cooking","Stay hydrated throughout the day"]
+    },
+    Unknown: { 
+      precaution:["Consult doctor for evaluation","Get blood tests","Maintain healthy diet","Track symptoms","Avoid strenuous activity","Regular sleep","Hydrate well"], 
+      diet:["Follow a heart-healthy diet with fresh foods","Eat fruits and vegetables every day","Choose whole grains over refined ones","Include lentils or beans for protein","Limit oily and sugary foods","Have low-fat milk or curd","Eat small balanced meals regularly","Drink enough water daily"]
+    }
+  }
+},
+hi: {
+  "Heart_Disease": {
+    Healthy: { 
+      precaution:["नियमित व्यायाम करें","स्वस्थ आहार बनाए रखें","पर्याप्त पानी पिएँ","अच्छी नींद लें","तनाव कम करें","धूम्रपान न करें","नियमित जांच कराएं"], 
+      diet:["रोज़ाना ताजे फल और सब्जियाँ खाएँ","चिकन या टोफू जैसी प्रोटीन लें","ओट्स या ब्राउन राइस जैसे साबुत अनाज खाएँ","लो-फैट दूध या दही लें","थोड़ी मात्रा में नट्स और बीज खाएँ","ज्यादा पानी पिएँ","जंक फूड और तली चीज़ें न खाएँ","हल्का और संतुलित भोजन करें"]
+    },
+    Mild: { 
+      precaution:["नमक का सेवन कम करें","रक्तचाप की निगरानी करें","हल्की एक्सरसाइज करें","अधिक शुगर से बचें","नियमित कार्डियोलॉजिस्ट जाँच","शराब सीमित करें","आदर्श वजन बनाए रखें"], 
+      diet:["नाश्ते में ओट्स या दलिया लें","खाने में हरी सब्जियाँ ज़्यादा रखें","स्नैक्स में फल या बेरी खाएँ","ग्रिल्ड मछली या चिकन लें","जैतून तेल का उपयोग करें","लो-फैट दूध या दही लें","भारी या मसालेदार भोजन न करें","मीठे पेय की जगह हर्बल चाय पिएँ"]
+    },
+    Moderate: { 
+      precaution:["दवा समय पर लें","नियमित कार्डियोलॉजिस्ट चेकअप","धूम्रपान और शराब से बचें","तनाव प्रबंधित करें","कोलेस्ट्रॉल की निगरानी","व्यायाम अनुसूची अपनाएं","मेडिकल लॉग रखें"], 
+      diet:["ब्राउन राइस या गेहूं जैसे साबुत अनाज लें","हफ्ते में दो बार मछली खाएँ","स्वस्थ वसा के लिए नट्स और बीज खाएँ","रोज़ाना ताजे फल खाएँ","हरी पत्तेदार सब्जियाँ हर भोजन में रखें","मक्खन की जगह जैतून तेल इस्तेमाल करें","घर का बना खाना खाएँ","नमकीन और पैक्ड फूड से बचें"]
+    },
+    Severe: { 
+      precaution:["अस्पताल में निगरानी आवश्यक","दवा का सख्त पालन करें","आपातकालीन योजना तैयार रखें","कठोर व्यायाम से बचें","नियमित स्वास्थ्य निगरानी","तनाव कम करें","डाइट प्लान का पालन करें"], 
+      diet:["दिन में थोड़ा-थोड़ा कर भोजन करें","उबली या स्टीम सब्जियाँ खाएँ","हल्की मछली या चिकन लें","सफेद चावल की जगह ब्राउन राइस या ओट्स लें","हर्बल चाय पिएँ","प्रोसेस्ड और नमकीन चीज़ें न खाएँ","खाने में कम तेल का प्रयोग करें","दिनभर पानी पिएँ"]
+    },
+    Unknown: { 
+      precaution:["मूल्यांकन के लिए डॉक्टर से परामर्श लें","ब्लड टेस्ट कराएं","स्वस्थ आहार बनाए रखें","लक्षणों को ट्रैक करें","कठोर गतिविधि से बचें","नियमित नींद","पर्याप्त पानी पिएँ"], 
+      diet:["ताजे फल-सब्जियाँ खाएँ","साबुत अनाज चुनें","दाल या बीन्स से प्रोटीन लें","तेल और मीठा कम करें","लो-फैट दूध या दही लें","थोड़ा-थोड़ा कर संतुलित खाना खाएँ","पानी पर्याप्त मात्रा में पिएँ"]
+    }
+  }
+},
+ta: {
+  "Heart_Disease": {
+    Healthy: { 
+      precaution:["தினமும் உடற்பயிற்சி செய்யவும்","சத்தான உணவை பராமரிக்கவும்","மிகவும் தண்ணீர் குடிக்கவும்","போதுமான உறக்கம் எடுக்கவும்","மன அழுத்தத்தை குறைக்கவும்","புகைபிடிக்காதீர்கள்","நியமித பரிசோதனை செய்யவும்"], 
+      diet:["தினமும் நிறமுள்ள பழங்களும் காய்கறிகளும் சாப்பிடவும்","சிறிய புரதம் உள்ள உணவு சேர்க்கவும்","ஓட்ஸ், கேழ்வரகு போன்ற தானியம் தேர்ந்தெடுக்கவும்","குறைந்த கொழுப்பு பால் அல்லது தயிர் எடுக்கவும்","சிறிதளவு நட்டுகள் மற்றும் விதைகள் சாப்பிடவும்","ஜங்க் உணவு தவிர்க்கவும்","போதுமான தண்ணீர் குடிக்கவும்","உணவு எளிதாகவும் சமநிலையிலும் இருக்கட்டும்"]
+    },
+    Mild: { 
+      precaution:["உப்பை குறைக்கவும்","ரத்த அழுத்தத்தை கண்காணிக்கவும்","ஒளிய உடற்பயிற்சி","அதிக சர்க்கரை தவிர்க்கவும்","நியமித கார்டியாலஜி சோதனை","மதுபானம் குறைக்கவும்","உடல் எடை பராமரிக்கவும்"], 
+      diet:["காலை உணவில் ஓட்ஸ் அல்லது கஞ்சி எடுக்கவும்","பச்சை காய்கறிகள் அதிகம் சேர்க்கவும்","இடையில் பழங்கள் அல்லது பெரி வகைகள் சாப்பிடவும்","கிரில் செய்யப்பட்ட மீன் அல்லது கோழி எடுக்கவும்","ஜெய்தூன் எண்ணெய் பயன்படுத்தவும்","குறைந்த கொழுப்பு பால் பொருட்கள் எடுக்கவும்","மசாலா உணவு தவிர்க்கவும்","ஹெர்பல் டீ குடிக்கவும்"]
+    },
+    Moderate: { 
+      precaution:["மருந்துகளை எடுத்துக்கொள்ளவும்","மாரடைப்புக்காரர் பரிசோதனை","புகை மற்றும் மதுபானம் தவிர்க்கவும்","மன அழுத்தத்தை குறைக்கவும்","கொழுப்பு அளவை கண்காணிக்கவும்","உடற்பயிற்சி திட்டம் பின்பற்றவும்","மருத்துவ பதிவுகள் வைக்கவும்"], 
+      diet:["முழு தானியங்கள் எடுத்துக்கொள்ளவும்","மீன் இரு முறை சாப்பிடவும்","நட்டுகள் மற்றும் விதைகள் சேர்க்கவும்","தினமும் பழங்கள் சாப்பிடவும்","கீரை வகைகள் சேர்க்கவும்","ஜெய்தூன் எண்ணெய் பயன்படுத்தவும்","வீட்டில் சமைத்த உணவு சாப்பிடவும்","பிராசசிங் உணவு தவிர்க்கவும்"]
+    },
+    Severe: { 
+      precaution:["மருத்துவ கண்காணிப்பு தேவை","மருந்துகளை கடைபிடிக்கவும்","அவசர திட்டம் தயாராக வைத்திருங்கள்","கடுமையான உடற்பயிற்சி தவிர்க்கவும்","முக்கிய நிலைகளை கண்காணிக்கவும்","மன அழுத்தத்தை குறைக்கவும்","மென்பான உணவு திட்டம் பின்பற்றவும்"], 
+      diet:["சிறு அளவில் அடிக்கடி உணவு எடுக்கவும்","வாடிய காய்கறிகள் சாப்பிடவும்","மீன் அல்லது கோழி அளவாக எடுக்கவும்","வெள்ளை அரிசி பதிலாக கேழ்வரகு அல்லது ஓட்ஸ்","ஹெர்பல் டீ குடிக்கவும்","உப்பு மற்றும் எண்ணெய் குறைக்கவும்","தண்ணீர் நிறைய குடிக்கவும்"]
+    },
+    Unknown: { 
+      precaution:["மருத்துவரை அணுகவும்","ரத்த பரிசோதனை செய்யவும்","சத்தான உணவை பின்பற்றவும்","அறிகுறிகளை கண்காணிக்கவும்","கடுமையான செயல்களை தவிர்க்கவும்","நியமித உறக்கம்","சத்தான தண்ணீர் குடிக்கவும்"], 
+      diet:["தினமும் பழங்களும் காய்கறிகளும் சாப்பிடவும்","முழு தானியங்கள் தேர்ந்தெடுக்கவும்","பீன்ஸ் அல்லது பருப்பு சேர்க்கவும்","குறைந்த எண்ணெய் உணவு சாப்பிடவும்","தயிர் அல்லது பால் சேர்க்கவும்","சிறு அளவில் அடிக்கடி உணவு எடுக்கவும்","தண்ணீர் நிறைய குடிக்கவும்"]
+    }
+  }
+},
+te: {
+  "Heart_Disease": {
+    Healthy: { 
+      precaution:["ప్రతిరోజూ వ్యాయామం చేయండి","ఆహారాన్ని ఆరోగ్యంగా ఉంచండి","తక్కువ మెలకువ","తగినంత నిద్ర","మానసిక ఒత్తిడిని తగ్గించండి","పుగళి కాకుండా ఉండండి","నియమిత తనిఖీలు చేయించుకోండి"], 
+      diet:["ప్రతిరోజూ తాజా పండ్లు మరియు కూరగాయలు తినండి","చికెన్ లేదా టోఫు వంటి లీన్ ప్రోటీన్ తీసుకోండి","ఓట్స్ లేదా బ్రౌన్ రైస్ వంటి పూర్తి ధాన్యాలు ఎంచుకోండి","తక్కువ కొవ్వు పాల ఉత్పత్తులు తీసుకోండి","కొద్దిగా నూనెలో వండిన ఆహారం తినండి","జంక్ ఫుడ్ దూరంగా ఉంచండి","ప్రతిరోజూ నీరు ఎక్కువగా తాగండి","భోజనం తేలికగా మరియు సమతుల్యంగా ఉంచండి"]
+    },
+    Mild: { 
+      precaution:["ఉప్పు తగ్గించండి","రక్తపోటు పర్యవేక్షణ","సౌకర్యవంతమైన వ్యాయామం","చక్కెర తగ్గించండి","నియమిత కార్డియాలజిస్ట్ చెకప్","మద్యం పరిమితం","ఆదర్శ బరువు"], 
+      diet:["ప్రాతఃకālం ఓట్స్ లేదా పప్పు తీసుకోండి","ఆకుకూరలు ఎక్కువగా తినండి","స్నాక్‌గా పండ్లు లేదా బెర్రీలు తినండి","వేపిన చేప లేదా చికెన్ తినండి","ఆలివ్ ఆయిల్ ఉపయోగించండి","తక్కువ కొవ్వు పాలు తీసుకోండి","భారీ లేదా మసాలా ఆహారం మానుకోండి","హర్బల్ టీ తాగండి"]
+    },
+    Moderate: { 
+      precaution:["వైద్య సలహా తీసుకోండి","నియమిత హార్ట్ చెకప్","పుగళి మరియు మద్యం మానుకోండి","మానసిక ఒత్తిడి తగ్గించండి","కొలెస్ట్రాల్ పర్యవేక్షణ","వ్యాయామం ప్రణాళిక","వైద్య రికార్డులు"], 
+      diet:["పూర్తి ధాన్యాలు తీసుకోండి","వారానికి రెండు సార్లు చేప తినండి","నట్స్ మరియు విత్తనాలు తినండి","తాజా పండ్లు తినండి","ఆకుకూరలు చేర్చండి","ఆలివ్ ఆయిల్ ఉపయోగించండి","ఇంట్లో వండిన ఆహారం తినండి","ప్రాసెస్ చేసిన ఆహారం మానుకోండి"]
+    },
+    Severe: { 
+      precaution:["హాస్పిటల్‌లో పర్యవేక్షణ అవసరం","మందులను కచ్చితంగా తీసుకోండి","తీవ్రమైన ప్రణాళిక సిద్ధం","కఠినమైన శారీరక కసరత్తు మానుకోండి","ముఖ్యమైన విటల్స్ పర్యవేక్షించండి","మానసిక ఒత్తిడి తగ్గించండి","ఆహార ప్రణాళిక పాటించండి"], 
+      diet:["తక్కువ ఉప్పు ఉన్న ఆహారం తీసుకోండి","వేపిన లేదా ఉడికించిన కూరగాయలు తినండి","బ్రౌన్ రైస్ లేదా ఓట్స్ ఎంచుకోండి","హర్బల్ టీ తాగండి","తక్కువ నూనెతో వండండి","రోజంతా నీరు తాగండి","ప్రాసెస్ చేసిన ఆహారం పూర్తిగా మానుకోండి"]
+    },
+    Unknown: { 
+      precaution:["వైద్యుడిని సంప్రదించండి","రక్త పరీక్షలు చేయించుకోండి","ఆహారాన్ని క్షేమంగా ఉంచండి","లక్షణాలను ట్రాక్ చేయండి","తీవ్రమైన కార్యకలాపం మానుకోండి","నియమిత నిద్ర","తగినంత హైడ్రేట్"], 
+      diet:["ప్రతిరోజూ తాజా ఆహారం తినండి","పండ్లు మరియు కూరగాయలు తీసుకోండి","పూర్తి ధాన్యాలు ఎంచుకోండి","పప్పులు మరియు ప్రోటీన్ కలిపి తినండి","తక్కువ కొవ్వు పాలు తీసుకోండి","తేలికపాటి భోజనం చేయండి","ఎక్కువ నీరు తాగండి"]
+    }
+  }
+},
+kn: {
+  "Heart_Disease": {
+    Healthy: { 
+      precaution:["ನಿಯಮಿತ ವ್ಯಾಯಾಮ","ಆರೋಗ್ಯಕರ ಆಹಾರ","ಹೆಚ್ಚು ನೀರು ಕುಡಿಯಿರಿ","ಸರೀ ನಿದ್ದೆ","ಮಾನದ ಒತ್ತಡ ಕಡಿಮೆಮಾಡಿ","ಪೂಲೆಹರಡುವುದನ್ನು ತಪ್ಪಿಸಿ","ನಿಯಮಿತ ತಪಾಸಣೆ"], 
+      diet:["ಪ್ರತಿದಿನ ಹಣ್ಣುಗಳು ಮತ್ತು ತರಕಾರಿಗಳು ತಿನಿರಿ","ಲೀನ್ ಪ್ರೋಟೀನ್ ಸೇರಿಸಿ","ಓಟ್ಸ್ ಅಥವಾ ಬ್ರೌನ್ ರೈಸ್ ಆಯ್ಕೆಮಾಡಿ","ಕಡಿಮೆ ಕೊಬ್ಬು ಹಾಲು ಅಥವಾ ಮೊಸರು ತಿನಿರಿ","ಸ್ವಲ್ಪ ಪ್ರಮಾಣದ ಬೀಜ ಮತ್ತು ನಟ್ ತಿನಿರಿ","ತೈಲ ಮತ್ತು ಫ್ರೈಡ್ ಆಹಾರ ತಪ್ಪಿಸಿ","ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ","ಹಗುರ ಮತ್ತು ಸಮತೋಲನ ಆಹಾರ ತಿನಿರಿ"]
+    },
+    Mild: { 
+      precaution:["ಉಪ್ಪು ಕಡಿಮೆ ಮಾಡಿ","ರಕ್ತದೊತ್ತಡ ಪರಿಶೀಲನೆ","ಹೆಚ್ಚು ವ್ಯಾಯಾಮ","ಅತಿಯಾದ ಸಕ್ಕರೆ ತಪ್ಪಿಸಿ","ನಿಯಮಿತ ಹೃದಯ ತಪಾಸಣೆ","ಮದ್ಯಪಾನ ಕಡಿಮೆ ಮಾಡಿ","ಆದರ್ಶ ಬರುವು"], 
+      diet:["ಬೆಳಿಗ್ಗೆ ಓಟ್ಸ್ ಅಥವಾ ಗಂಜಿ ತಿನಿರಿ","ಹಸಿರು ತರಕಾರಿ ಹೆಚ್ಚಿಸಿ","ಹಣ್ಣು ಅಥವಾ ಬೆರ್ರಿ ತಿನಿರಿ","ಗ್ರಿಲ್ ಮಾಡಿದ ಮೀನು ಅಥವಾ ಕೋಳಿ","ಓಲಿವ್ ಎಣ್ಣೆ ಬಳಸಿ","ಕಡಿಮೆ ಕೊಬ್ಬು ಹಾಲು ತಿನಿರಿ","ಭಾರಿ ಅಥವಾ ಮಸಾಲೆ ಆಹಾರ ತಪ್ಪಿಸಿ","ಹರ್ಬಲ್ ಟೀ ಕುಡಿಯಿರಿ"]
+    },
+    Moderate: { 
+      precaution:["ಮರಾಠಿ ಚಿಕಿತ್ಸೆಯನ್ನು ಅನುಸರಿಸಿ","ನಿಯಮಿತ ಹೃದ್ರೋಗ ತಪಾಸಣೆ","ಪೂಲೆ ಮತ್ತು ಮದ್ಯಪಾನ ತಪ್ಪಿಸಿ","ಮಾನಸಿಕ ಒತ್ತಡ ಕಡಿಮೆಮಾಡಿ","ಕೋಲೆಸ್ಟ್ರಾಲ್ ಪರಿಶೀಲನೆ","ವ್ಯಾಯಾಮ ಕ್ರಮ","ಮರಾಠಿ ದಾಖಲೆ"], 
+      diet:["ಪೂರ್ಣ ಧಾನ್ಯಗಳು ತಿನಿರಿ","ಮೀನು ವಾರದಲ್ಲಿ ಎರಡು ಬಾರಿ","ಬೀಜ ಮತ್ತು ಕಾಳು ಸೇರಿಸಿ","ಪ್ರತಿದಿನ ಹಣ್ಣು ತಿನಿರಿ","ಹಸಿರು ಸೊಪ್ಪು ತಿನಿರಿ","ಓಲಿವ್ ಎಣ್ಣೆ ಬಳಸಿ","ಮನೆಯ ಆಹಾರ ತಿನಿರಿ","ಪ್ಯಾಕೇಜ್ಡ್ ಆಹಾರ ತಪ್ಪಿಸಿ"]
+    },
+    Severe: { 
+      precaution:["ಆಸ್ಪತ್ರೆ ಮೇಲೆ ಮೇಲ್ವಿಚಾರಣೆ","ಮೂಢತೆಯಾಗಿ ಔಷಧಿ","ತೀವ್ರ ಯೋಜನೆ ಸಿದ್ಧ","ತೀವ್ರ ವ್ಯಾಯಾಮ ತಪ್ಪಿಸಿ","ಮುಖ್ಯ ಜೀವಾಶಕ್ತಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ","ಮಾನಸಿಕ ಒತ್ತಡ ಕಡಿಮೆಮಾಡಿ","ಆಹಾರ ಕ್ರಮ ಅನುಸರಿಸಿ"], 
+      diet:["ಸ್ವಲ್ಪಸ್ವಲ್ಪ ಊಟ ಮಾಡಿ","ಬೋಯಿಲ್ ಮಾಡಿದ ತರಕಾರಿ ತಿನಿರಿ","ಬೋಯಿಲ್ ಮಾಡಿದ ಮೀನು ಅಥವಾ ಕೋಳಿ","ಬ್ರೌನ್ ರೈಸ್ ಅಥವಾ ಓಟ್ಸ್ ಆಯ್ಕೆಮಾಡಿ","ಹರ್ಬಲ್ ಟೀ ಕುಡಿಯಿರಿ","ಎಣ್ಣೆ ಕಡಿಮೆ ಬಳಸಿ","ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ","ಪ್ರೋಸೆಸ್ಡ್ ಆಹಾರ ತಪ್ಪಿಸಿ"]
+    },
+    Unknown: { 
+      precaution:["ಮೌಲ್ಯಮಾಪನಕ್ಕಾಗಿ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ","ರಕ್ತ ಪರೀಕ್ಷೆ ಮಾಡಿಸಿ","ಆಹಾರ ಆರೋಗ್ಯಕರವಾಗಿರಲಿ","ಲಕ್ಷಣಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ","ತೀವ್ರ ಚಟುವಟಿಕೆ ತಪ್ಪಿಸಿ","ನಿಯಮಿತ ನಿದ್ದೆ","ಹೆಚ್ಚು ನೀರು ಕುಡಿಯಿರಿ"], 
+      diet:["ಹಣ್ಣುಗಳು ಮತ್ತು ತರಕಾರಿಗಳು ತಿನಿರಿ","ಪೂರ್ಣ ಧಾನ್ಯಗಳು ಆಯ್ಕೆಮಾಡಿ","ದಾಳುಗಳು ಮತ್ತು ಬೀಜ ಸೇರಿಸಿ","ಎಣ್ಣೆ ಮತ್ತು ಸಕ್ಕರೆ ಕಡಿಮೆ ಮಾಡಿ","ಕಡಿಮೆ ಕೊಬ್ಬು ಹಾಲು ತಿನಿರಿ","ಸ್ವಲ್ಪಸ್ವಲ್ಪ ಊಟ ಮಾಡಿ","ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ"]
+    }
+  }
+},
+bn: {
+  "Heart_Disease": {
+    Healthy: { 
+      precaution:["নিয়মিত ব্যায়াম করুন","স্বাস্থ্যকর খাবার বজায় রাখুন","প্রচুর পানি পান করুন","যথেষ্ট ঘুম নিন","মানসিক চাপ কমান","ধূমপান করবেন না","নিয়মিত পরীক্ষা করুন"], 
+      diet:["রোজ তাজা ফল ও শাকসবজি খান","চিকেন বা টোফুর মতো প্রোটিন নিন","ওটস বা ব্রাউন রাইসের মতো শস্য বেছে নিন","কম চর্বির দুধ বা দই খান","অল্প বাদাম ও বীজ খান","জাঙ্ক ফুড ও ভাজা খাবার এড়ান","পর্যাপ্ত পানি পান করুন","হালকা ও ভারসাম্যপূর্ণ খাবার খান"]
+    },
+    Mild: { 
+      precaution:["লবণ কম করুন","রক্তচাপ পর্যবেক্ষণ","হালকা ব্যায়াম","অতিরিক্ত চিনি এড়ান","নিয়মিত কার্ডিওলজিস্ট চেকআপ","মদ সীমিত করুন","আদর্শ ওজন বজায় রাখুন"], 
+      diet:["নাশতায় ওটস বা পোরিজ খান","সবুজ শাকসবজি বেশি খান","স্ন্যাকসে ফল বা বেরি নিন","গ্রিল করা মাছ বা মুরগি খান","জলপাই তেল ব্যবহার করুন","কম চর্বির দুধ বা দই খান","মসলাদার খাবার এড়ান","চিনিযুক্ত পানীয়ের বদলে হার্বাল চা পান করুন"]
+    },
+    Moderate: { 
+      precaution:["নির্ধারিত ওষুধ নিন","নিয়মিত কার্ডিওলজিস্ট চেকআপ","ধূমপান ও মদ্যপান এড়ান","মানসিক চাপ কমান","কোলেস্টেরল পর্যবেক্ষণ","ব্যায়ামের রুটিন অনুসরণ করুন","মেডিকেল লগ রাখুন"], 
+      diet:["ব্রাউন রাইস বা গমের মতো শস্য খান","সপ্তাহে দুবার মাছ খান","বাদাম ও বীজ খান","প্রতিদিন ফল খান","পাতাযুক্ত সবজি খাওয়া অভ্যাস করুন","মাখনের পরিবর্তে জলপাই তেল ব্যবহার করুন","বাড়ির খাবার খান","প্যাকেটজাত খাবার এড়ান"]
+    },
+    Severe: { 
+      precaution:["হাসপাতালে পর্যবেক্ষণ প্রয়োজন","কঠোরভাবে ওষুধ গ্রহণ","জরুরি পরিকল্পনা প্রস্তুত রাখুন","কঠোর শারীরিক কাজ এড়ান","ভিটালস নিয়মিত পরীক্ষা করুন","মানসিক চাপ কমান","ডায়েট অনুসরণ করুন"], 
+      diet:["অল্প অল্প করে বারবার খান","সেদ্ধ বা ভাপে রান্না করা সবজি খান","মাছ বা মুরগি অল্প পরিমাণে খান","ব্রাউন রাইস বা ওটস নিন","হার্বাল চা পান করুন","নুন ও তেল কম খান","পানি পর্যাপ্ত পরিমাণে পান করুন","প্রসেসড খাবার সম্পূর্ণভাবে এড়ান"]
+    },
+    Unknown: { 
+      precaution:["মূল্যায়নের জন্য ডাক্তারকে পরামর্শ করুন","রক্ত পরীক্ষা করান","স্বাস্থ্যকর খাবার অনুসরণ করুন","লক্ষণ ট্র্যাক করুন","কঠোর কার্যকলাপ এড়ান","নিয়মিত ঘুম","প্রচুর পানি পান করুন"], 
+      diet:["তাজা ফল ও সবজি খান","সম্পূর্ণ শস্য বেছে নিন","ডাল ও প্রোটিন খান","তেল ও মিষ্টি কমান","কম চর্বির দুধ খান","হালকা ও ছোট খাবার খান","প্রচুর পানি পান করুন"]
+    }
+  }
+}
+};
+
+
+if(langSelect){
+    langSelect.addEventListener('change', function() {
+        const lang = this.value;
+        if(lang && DATA[lang] && DATA[lang]["Heart_Disease"] && DATA[lang]["Heart_Disease"][severity]){
+            const current = DATA[lang]["Heart_Disease"][severity];
+
+            
+            precautionList.innerHTML = '';
+            current.precaution.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                precautionList.appendChild(li);
+            });
+            precautionBox.style.display = 'block';
+
+          
+            dietList.innerHTML = '';
+            current.diet.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                dietList.appendChild(li);
+            });
+            dietBox.style.display = 'block';
+        } else {
+            precautionBox.style.display = 'none';
+            dietBox.style.display = 'none';
+        }
+    });
+};
+
+
+// 
+if (downloadBtn) {
+    const { jsPDF } = window.jspdf;
+  downloadBtn.addEventListener("click", () => {
+    console.log("✅ Download button clicked");
+
+    const doc = new jsPDF("p", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    
+    doc.setFillColor(230, 245, 255); 
+    doc.rect(0, 0, pageWidth, pageHeight, "F");
+
+    
+    doc.setDrawColor(0, 102, 204);
+    doc.setLineWidth(1.2);
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(0, 51, 102);
+    doc.text("HEART DISEASE HEALTH REPORT", pageWidth / 2, 20, { align: "center" });
+
+    
+    doc.setDrawColor(0, 102, 204);
+    doc.setLineWidth(0.8);
+    doc.line(10, 25, pageWidth - 10, 25);
+
+    let y = 35;
+
+    
+const name = "{{ patientName or 'N/A' }}";
+const age = "{{ patientAge or 'N/A' }}";
+const gender = "{{ patientGender or 'N/A' }}";
+const place = "{{ patientPlace or 'N/A' }}";
+
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Patient Information", 10, y);
+    y += 6;
+
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(150, 150, 150);
+    doc.rect(10, y, pageWidth - 20, 20);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${name}`, 15, y + 7);
+    doc.text(`Age: ${age}`, 15, y + 13);
+    doc.text(`Gender: ${gender}`, pageWidth / 2, y + 7);
+    doc.text(`Place: ${place}`, pageWidth / 2, y + 13);
+    y += 30;
+
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Prediction & Severity", 10, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Heart Disease Prediction: " + disease, 10, y);
+    y += 8;
+    doc.text("Severity: " + severity, 10, y);
+    y += 10;
+
+    
+    doc.autoTable({
+      startY: y,
+      head: [["Precautionary Measures"]],
+      body: Array.from(precautionList.children).map((li) => [li.textContent]),
+      theme: "grid",
+      headStyles: {
+        fillColor: [0, 179, 71],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      styles: { fontSize: 11, cellPadding: 3 },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    
+    doc.autoTable({
+      startY: y,
+      head: [["Diet Plan"]],
+      body: Array.from(dietList.children).map((li) => [li.textContent]),
+      theme: "grid",
+      headStyles: {
+        fillColor: [0, 102, 255],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      styles: { fontSize: 11, cellPadding: 3 },
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    
+    if (CHECKUPS[severity]) {
+      doc.autoTable({
+        startY: y,
+        head: [["Daily Checkups"]],
+        body: CHECKUPS[severity].daily.map((task) => [task]),
+        theme: "grid",
+        headStyles: {
+          fillColor: [255, 179, 0],
+          textColor: 0,
+          fontStyle: "bold",
+          halign: "center",
+        },
+        styles: { fontSize: 11, cellPadding: 3 },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      
+      doc.autoTable({
+        startY: y,
+        head: [["Weekly Checkups"]],
+        body: CHECKUPS[severity].weekly.map((task) => [task]),
+        theme: "grid",
+        headStyles: {
+          fillColor: [255, 23, 68],
+          textColor: 255,
+          fontStyle: "bold",
+          halign: "center",
+        },
+        styles: { fontSize: 11, cellPadding: 3 },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(
+      "Report generated automatically by Heart Health Predictor © 2025",
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: "center" }
+    );
+
+  
+    doc.save(`${name}_Heart_Report.pdf`);
+  });
+}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const preds = {{ preds|tojson }};
+    const labels = {{ disease_classes|tojson }};
+
+    if (preds && preds.length > 0) {
+        const ctx = document.getElementById('probabilityChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Prediction Probability',
+                    data: preds,
+                    backgroundColor: [
+                        'rgba(255,99,132,0.6)',
+                        'rgba(54,162,235,0.6)',
+                        'rgba(255,206,86,0.6)',
+                        'rgba(75,192,192,0.6)',
+                        'rgba(153,102,255,0.6)',
+                        'rgba(255,159,64,0.6)'
+                    ],
+                    borderColor: 'rgba(255,255,255,0.8)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1.0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#ffffff' }
+                    }
+                }
+            }
+        });
+    }
+</script>
+<script>
+// ======== 🧠 LIVE WIKIPEDIA FETCH SECTION ========
+
+// This function fetches and displays live Wikipedia data
+async function fetchWikipediaInfo(disease) {
+  const wikiBox = document.getElementById("wikiContent");
+  if (!wikiBox) return; // if wiki section not found
+
+  // If prediction not available or is "Not_Heart", skip fetching
+  if (!disease || disease === "Not_Heart") {
+    wikiBox.innerHTML = "<p>No Wikipedia data available for this condition.</p>";
+    return;
+  }
+
+  // Convert underscores to spaces for readable search query
+  const query = disease.replace(/_/g, " ");
+  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Wikipedia fetch failed");
+    const data = await response.json();
+
+    if (data.extract) {
+      wikiBox.innerHTML = `
+        <h2 style="color:#ff3366;">📘 About ${data.title}</h2>
+        <p style="font-size:1.1em; color:#ddd; line-height:1.6;">${data.extract}</p>
+        <a href="${data.content_urls.desktop.page}" target="_blank"
+           style="color:#00ffff; text-decoration:none; font-weight:bold;">
+           🔗 Read full article on Wikipedia
+        </a>
+      `;
+    } else {
+      wikiBox.innerHTML = "<p>No relevant information found on Wikipedia.</p>";
+    }
+  } catch (err) {
+    console.error(err);
+    wikiBox.innerHTML = "<p>Unable to load Wikipedia information.</p>";
+  }
+}
+
+// Automatically fetch Wikipedia info after the page loads
+document.addEventListener("DOMContentLoaded", () => {
+  const predictedDisease = "{{ prediction }}";  // comes from Flask render_template
+  if (predictedDisease) fetchWikipediaInfo(predictedDisease);
+});
+</script>
+
+
+</body>
+</html>
