@@ -1,12 +1,63 @@
+# =========================
+# Python
+# =========================
 __pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# =========================
+# Jupyter / Notebooks
+# =========================
 .ipynb_checkpoints/
+notebooks/
+
+# =========================
+# Data / Large Files
+# =========================
+data/
 *.csv
 *.zip
 *.rar
 *.tar
 *.gz
-*.log
-.env
 *.pkl
-.venv/
+*.h5.bak
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Uploads
+# =========================
 static/uploads/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE Files
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Testing / Experimental
+# =========================
+test_model.py
+download_not_heart_images.py
+scripts/
