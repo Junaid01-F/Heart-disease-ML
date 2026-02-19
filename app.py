@@ -3,6 +3,9 @@ import time
 import numpy as np
 import tensorflow as tf
 
+# Disable GPU (important for Render)
+tf.config.set_visible_devices([], 'GPU')
+
 from flask import Flask, render_template, request
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
@@ -47,29 +50,34 @@ print("✅ Model loaded successfully.")
 # Prediction Function
 # =========================
 def predict_image(img_path):
-    img = image.load_img(img_path, target_size=IMG_SIZE)
-    img_array = image.img_to_array(img) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
+    try:
+        img = image.load_img(img_path, target_size=IMG_SIZE)
+        img_array = image.img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
 
-    preds = model.predict(img_array)[0]
-    class_index = int(np.argmax(preds))
-    prediction = DISEASE_CLASSES[class_index]
-    confidence = float(preds[class_index])
+        preds = model.predict(img_array, verbose=0)[0]
+        class_index = int(np.argmax(preds))
+        prediction = DISEASE_CLASSES[class_index]
+        confidence = float(preds[class_index])
 
-    # Severity Logic
-    if prediction == "Normal":
-        severity = "Healthy"
-    elif prediction == "Not_Heart":
-        severity = "N/A"
-    else:
-        if confidence < 0.4:
-            severity = "Mild"
-        elif confidence < 0.7:
-            severity = "Moderate"
+        # Severity Logic
+        if prediction == "Normal":
+            severity = "Healthy"
+        elif prediction == "Not_Heart":
+            severity = "N/A"
         else:
-            severity = "Severe"
+            if confidence < 0.4:
+                severity = "Mild"
+            elif confidence < 0.7:
+                severity = "Moderate"
+            else:
+                severity = "Severe"
 
-    return prediction, severity, preds.tolist()
+        return prediction, severity, preds.tolist()
+
+    except Exception as e:
+        print("Prediction Error:", e)
+        return "Error", "Error", []
 
 
 # =========================
@@ -98,12 +106,17 @@ def index():
         file = request.files.get("file")
 
         if file and file.filename != "":
-            timestamp = int(time.time())
-            filename = f"{timestamp}_{file.filename}"
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+            try:
+                timestamp = int(time.time())
+                filename = f"{timestamp}_{file.filename}"
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(filepath)
 
-            prediction, severity, preds = predict_image(filepath)
+                prediction, severity, preds = predict_image(filepath)
+
+            except Exception as e:
+                print("Upload Error:", e)
+                return render_template("index.html", error="Error processing image.")
 
         else:
             return render_template("index.html", error="Please upload an image.")
