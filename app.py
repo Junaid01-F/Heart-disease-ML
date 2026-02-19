@@ -17,7 +17,7 @@ app = Flask(__name__)
 # =========================
 # Paths & Config
 # =========================
-MODEL_PATH = "models/heart_cnn_final.h5"
+MODEL_PATH = "models/heart_cnn_final_optimized.h5"
 UPLOAD_FOLDER = "static/uploads"
 HEATMAP_FOLDER = "static"
 
