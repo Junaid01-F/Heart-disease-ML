@@ -11,7 +11,26 @@ from tensorflow.keras.preprocessing import image
 
 app = Flask(__name__)
 
+MODEL_PATH = "models/heart_cnn_final.h5" #.......
+import gdown
+
 MODEL_PATH = "models/heart_cnn_final.h5"
+
+# Google Drive direct download link
+url = "https://drive.google.com/uc?export=download&id=1_YsETgvrt7myJGK4yzb34r5-wvNSfWYU"
+
+# Create models folder if not exists
+os.makedirs("models", exist_ok=True)
+
+# Download model if not exists
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model...")
+    gdown.download(url, MODEL_PATH, quiet=False)
+
+# Load model
+model = load_model(MODEL_PATH)
+print("Model loaded successfully")
+
 # Load model once
 model = load_model(MODEL_PATH)
 model.build((None, 128, 128, 3))
