@@ -7,8 +7,6 @@ __pycache__/
 *.gz
 *.log
 .env
-models/
-*.h5
 *.pkl
 .venv/
 static/uploads/
