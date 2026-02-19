@@ -1,0 +1,1 @@
+{'Arrhythmogenic_right_ventricular_cardiomyopathy': 0, 'Dilated_cardiomyopathy': 1, 'Hypertrophic_cardiomyopathy': 2, 'Myocardial_infarction': 3, 'Normal': 4}
