@@ -10,3 +10,5 @@ __pycache__/
 models/
 *.h5
 *.pkl
+.venv/
+static/uploads/
