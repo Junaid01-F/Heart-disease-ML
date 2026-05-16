@@ -86,7 +86,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Access the application at `http://127.0.0.1:5000/`.
+Access the application at https://heart-disease-ml-3-8upd.onrender.com
 
 ---
 
